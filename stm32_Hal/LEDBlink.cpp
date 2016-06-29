@@ -3,32 +3,23 @@
 #ifdef __cplusplus
 extern "C"
 #endif
-void SysTick_Handler(void)
-{
-	HAL_IncTick();
-	HAL_SYSTICK_IRQHandler();
-}
 
-int main(void)
+void EXTI0_1_IRQHandler(void)
 {
-	HAL_Init();
-	
-	__GPIOC_CLK_ENABLE();
-	GPIO_InitTypeDef GPIO_InitStructure;
-	
-	GPIO_InitStructure.Pin = GPIO_PIN_9;
-	
-	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
-	GPIO_InitStructure.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);
-	
-	for (;;)
+	if(__HAL_GPO_EXTI_GET_IT(GPIO_PIN_0) != RESET)
 	{
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
-		HAL_Delay(500);
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_RESET);
-		HAL_Delay(500);
-	
+		__HAL_GPO_EXTI_CLEAR_IT(GPIO_PIN_0);
+		HAL_GPO_TogglePin(GPIOC, GPIO_PIN_9);
+		HAL_GPO_TogglePin(GPIOC, GPIO_PIN_8);
 	}
 }
+
+Input_InitStructure.Speed = GPIO_SPEED_HIGH;
+Input_InitStructure.Pull = GPIO_NOPULL;
+Input_InitStructure.Pin = GPIO_PIN_0;
+Input_InitStructure.Mode = GPIO_MODE_IT_RISING_FALLING;
+HAL_GPIO_Init(GPIOA, &Input.InitStructure);
+HAL_NVIC_SetPriority(EXTI0_1_IRQn, 2, 0);
+HAL_NVIC_EnableIRQ(EXTI0_1_IRQn);
+
+//delete the content of the main loop at the bottom of main()
